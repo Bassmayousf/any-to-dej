@@ -1,0 +1,55 @@
+var stickyFooter = (function() {
+    return {
+        getCookie: function(name) {
+            let matches = document.cookie.match(new RegExp(
+              "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+            ));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        },
+        setCookie: function(name,value,days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days*24*60*60*1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+        }
+    };
+})();
+
+/*sticky footer*/
+jQuery('.trigger-fast-track-modal').on("click", function() {
+    if(stickyFooter.getCookie('stickyFooter') !== "undefined"){
+      jQuery("#full-sticky-footer-container").hide();
+      jQuery("#scroll_totop").show();
+    }
+});
+
+
+jQuery('#full-sticky-footer-container .x-button').on("click", function() {
+    if(jQuery(window).width() <= 480 ) {
+        jQuery("#full-sticky-footer-container").hide();
+        jQuery("#scroll_totop").show();
+        stickyFooter.setCookie('stickyFooter','displayed',30);
+    }
+});
+
+jQuery('#fast-track-modal-window-close').on("click", function() {
+  let cookieFooter = stickyFooter.getCookie('stickyFooter');
+  jQuery("#scroll_totop").hide();
+  if(typeof cookieFooter === "undefined" && jQuery(window).width() <= 480){
+    jQuery("#full-sticky-footer-container").show();
+  }
+});
+
+jQuery(document).ready(function() {
+  var cookieModal = stickyFooter.getCookie('fastTrackModal');
+  var cookieFooter = stickyFooter.getCookie('stickyFooter');
+  if( cookieModal === "fastTrackModal_displayed" 
+    &&  typeof cookieFooter === 'undefined'
+    && jQuery(window).width() <= 480 ) {
+        jQuery("#full-sticky-footer-container").show();
+    }
+});
+
